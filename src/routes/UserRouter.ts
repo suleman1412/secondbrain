@@ -58,6 +58,7 @@ UserRouter.post('/login', async(req: Request, res:Response) => {
                 message: "Error in inputs",
                 errors: error.errors
             });
+            return;
         }
         else{
             const existingUser = await UsersModel.findOne({ username: data.username })
@@ -73,21 +74,28 @@ UserRouter.post('/login', async(req: Request, res:Response) => {
                         message: "Login Succesful, token set", 
                         token: token 
                     })
+                    return;
+
                 } else{
                     res.status(401).json({
                         message: "Password incorrect, please try again"
                     })
+                    return;
+
                 }
             } else {
                 res.status(404).json({
                     message: "User doesn't exist, please sign up"
                 });
+                return;
+
             }
         }
     } catch(error){
         res.status(500).json({
             message: "Internal Server Error"
         })
+        return;
         
     }
 
