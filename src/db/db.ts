@@ -11,11 +11,21 @@ const UserSchema = new Schema({
 
 export const contentTypes = ['image', 'video', 'article', 'audio'] as const
 const ContentSchema = new Schema({
-    link: {type: String, required: true},
+    link: {
+        type: String, 
+        required: true,
+        validate: {
+            validator: (a : string) => {
+                return /https?:\/\/(www\.)?[a-zA-Z0-9\-]+\.[a-z]{2,}(\/[^\s]*)?|\bwww\.[a-zA-Z0-9\-]+\.[a-z]{2,}(\/[^\s]*)?/.test(a)
+            },
+            message: "Please enter a valid URL"
+        }
+    },
     type: {type: String, enum:contentTypes, required: true},
     title: {type: String, required: true},
     tags: [{type: Types.ObjectId, ref: 'Tags'}],
-    userId: {type: Types.ObjectId, ref: 'Users', required:true}
+    userId: {type: Types.ObjectId, ref: 'Users', required:true},
+    updatedAt: {type: Date, default: Date.now()}
 })
 
 const TagSchema = new Schema({
