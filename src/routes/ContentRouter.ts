@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { ContentSchema } from "../types/Schemas";
 import { ContentModel } from "../db/db";
+import { ProcessTags } from "../utils/ProcessTag";
 
 export const ContentRouter = Router()
 
@@ -16,11 +17,15 @@ ContentRouter.post('/add', authMiddleware, async(req: Request, res: Response) =>
                 errors: error.errors
             });
         } else{
+            
+            // Making DB call to TagSchema here to create if not exist Tags and extract the tagIds
+            const tagIds = await ProcessTags(data.tags)
+
             await ContentModel.create({
                 link: data.link,
                 type: data.type,
                 title: data.title,
-                tags: data.tags,
+                tags: tagIds,
                 // @ts-ignore
                 userId: req.userId
             })
