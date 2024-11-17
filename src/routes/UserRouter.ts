@@ -1,5 +1,4 @@
-import { json, Request, Response, Router } from 'express'
-import { number, z } from 'zod'
+import { Request, Response, Router } from 'express'
 import { AuthSchema } from '../types/Schemas'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
