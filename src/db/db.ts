@@ -1,30 +1,21 @@
-import mongoose, {model, Mongoose, Schema, Types} from "mongoose";
+import mongoose, {model, Schema, Types} from "mongoose";
 import dotenv from 'dotenv';
 
 dotenv.config()
 mongoose.connect(process.env.MONGO_URL!)
 
 const UserSchema = new Schema({
-    username: {type: String, required: true},
-    password: String
+    username: {type: String, required: true, unique:true},
+    password: { type: String, required: true }
 })
 
-const contentTypes = ['image', 'video', 'article', 'audio']
+export const contentTypes = ['image', 'video', 'article', 'audio'] as const
 const ContentSchema = new Schema({
     link: {type: String, required: true},
     type: {type: String, enum:contentTypes, required: true},
     title: {type: String, required: true},
     tags: [{type: Types.ObjectId, ref: 'Tags'}],
-    userId: {
-        type: Types.ObjectId, 
-        ref: 'Users', 
-        required:true, 
-        validate: async (value : Types.ObjectId) : Promise<void | Error> => {
-        const user = await Users.findById(value);
-        if(!user){
-            throw new Error ("User does not exist")
-        }
-    }}
+    userId: {type: Types.ObjectId, ref: 'Users', required:true}
 })
 
 const TagSchema = new Schema({
@@ -36,14 +27,7 @@ const LinkSchema = new Schema({
     userId: {type: Types.ObjectId, ref: 'Users', required: true}
 })
 
-const Users = model("Users", UserSchema)
-const Content = model("Content", ContentSchema)
-const Tags = model("Tags", TagSchema)
-const Links = model("Links", LinkSchema)
-
-module.exports = {
-    Users,
-    Content,
-    Tags,
-    Links
-}
+export const UsersModel = model("Users", UserSchema)
+export const ContentModel = model("Content", ContentSchema)
+export const TagsModel = model("Tags", TagSchema)
+export const LinksModel = model("Links", LinkSchema)
