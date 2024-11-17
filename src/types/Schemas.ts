@@ -13,9 +13,10 @@ export const ContentSchema = z.object({
     link: z.string().min(1, {message: "Enter a valid link"}),
     type: z.enum(contentTypes, {message: "Enter a valid type"}),
     title: z.string().min(1, {message: "Enter title"}),
-    tags: z.string().array(),
+    tags: z.string().toLowerCase().trim().max(12, { message: "Max length of tag is 12" }) 
+        .transform((v) => 
+        v.replace(/[&\/\\#, +()$~%.'":*?<>{}]/g, '-') 
+        )
+        .array()
 })
 
-export const TagSchema = z.object({
-    tag: z.string().min(3, {message: "Tag should be longer than 3 letters"})
-})
