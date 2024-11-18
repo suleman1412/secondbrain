@@ -48,10 +48,13 @@ ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
         const allContent = await ContentModel.find({ 
             // @ts-ignore
             userId: req.userId
-        }).populate("userId", "username")
+        })
+        .populate("userId", "username")
+        .populate("tags", 'title')
+        
         res.status(200).json({
             // @ts-ignore
-            message: `All Content for ${req.userId}`,
+            message: `All Content for ${allContent.userId.username}`,
             allContent
         })
     } catch (e){
@@ -60,7 +63,6 @@ ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
             error: e
         })
     }
-        
 })
 
 // Delete a document

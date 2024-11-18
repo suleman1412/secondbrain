@@ -22,7 +22,7 @@ const ContentSchema = new Schema({
         }
     },
     type: {type: String, enum:contentTypes, required: true},
-    title: {type: String, required: true, unique: true},
+    title: {type: String, required: true},
     tags: [{type: Types.ObjectId, ref: 'Tags'}],
     userId: {type: Types.ObjectId, ref: 'Users', required:true},
 }, {timestamps: true})
@@ -31,14 +31,13 @@ const TagSchema = new Schema({
     title: {
         type: String, 
         required:true, 
-        unique: true,
         set: (a: string) => a.toLowerCase().trim()
     }
 
 })
 
 const LinkSchema = new Schema({
-    hash: {type: String, required: true},
+    hash: {type: String, required: true, unique:true},
     userId: {type: Types.ObjectId, ref: 'Users', required: true}
 })
 
