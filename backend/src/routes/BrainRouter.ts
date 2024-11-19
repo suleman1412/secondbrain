@@ -20,7 +20,7 @@ BrainRouter.post("/share", authMiddleware, async (req: Request, res: Response) =
         }
 
         if (shareLink) {
-            const hash = crypto.createHash("sha256").update(userId + content?.createdAt).digest("hex");
+            const hash = crypto.createHash("sha256").update(userId + Date.now()).digest("hex");
 
             const linkCreated = await LinksModel.findOneAndUpdate(
                 { userId },
@@ -29,7 +29,7 @@ BrainRouter.post("/share", authMiddleware, async (req: Request, res: Response) =
             );
 
             res.status(200).json({
-                message: "User has content in the Brain, here's a link for it.",
+                message: `Share link enabled for ${linkCreated.userId}`,
                 link: linkCreated.hash,
             });
         } else {
@@ -38,7 +38,8 @@ BrainRouter.post("/share", authMiddleware, async (req: Request, res: Response) =
             res.status(200).json({
                 message: "Share link has been disabled.",
             });
-        }
+        } 
+        
     } catch (e) {
         console.error("Error in /share:", e);
         res.status(500).json({
