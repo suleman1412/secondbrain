@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React from 'react'
+import { Button } from './ui/Button';
+// import PlusIcon from './ui/icons/plusIcon';
 
 const Register = () => {
     
@@ -29,6 +31,8 @@ const Register = () => {
                 <input type='password' name='password' placeholder='Enter your password' />
                 <input className='cursor-pointer' type='submit' />
             </form>
+            {/* <Button variant="primary" text="Add Content" icon={<PlusIcon />} size="lg" />
+            <Button variant="secondary" text="Add Content" icon={<PlusIcon />} size="md" /> */}
 
         </div>
     )
