@@ -1,6 +1,8 @@
 import { Brain } from "lucide-react"
 import { ReactElement } from "react"
 import { Button } from "./ui/Button"
+import { Link } from 'react-router-dom';
+
 
 export const NavBar = (): ReactElement => { 
     return(
@@ -10,12 +12,16 @@ export const NavBar = (): ReactElement => {
                 <h1 className='font-font1 font-semibold text-weigh text-[1.25rem] md:text-[2rem] tracking-tight'>Second Brain</h1>
             </div>
             <div className='flex gap-4 text-[0.6rem] md:text-[0.8rem] font-medium'>
-                <Button variant='secondary'>
-                    Login
-                </Button>
-                <Button variant='primary'>
-                    Register
-                </Button>
+                <Link to='/login'>
+                    <Button variant='secondary'>
+                        Login
+                    </Button>
+                </Link>
+                <Link to='/register'>
+                    <Button variant='primary'>
+                        Register
+                    </Button>
+                </Link>
             </div>
         </div>
     )
