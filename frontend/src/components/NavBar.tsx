@@ -1,10 +1,11 @@
 import { Brain } from "lucide-react"
-import { ReactElement } from "react"
+import { ReactElement} from "react"
 import { Button } from "./ui/Button"
 import { Link } from 'react-router-dom';
 
 
-export const NavBar = (): ReactElement => { 
+export const NavBar = (): ReactElement => {
+  
     return(
         <div className='flex justify-between items-center text-text '>
             <div className='brand flex gap-2 items-center '>

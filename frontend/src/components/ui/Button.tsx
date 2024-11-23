@@ -23,7 +23,7 @@ export const Button: React.FC<ButtonProps> = ({
     font = "manrope",
     className = ''
 }) => {
-    const baseStyle = 'px-3 py-1 md:px-5 md:py-2 rounded antialiased'; 
+    const baseStyle = 'px-3 py-1 md:px-5 md:py-2 rounded antialiased tracking-wide'; 
     return (
         <button className={`${baseStyle} ${fontStyles[font]} ${className} ${variantStyles[variant]}`}>
             {children}
