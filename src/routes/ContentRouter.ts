@@ -8,7 +8,7 @@ export const ContentRouter = Router()
 
 
 // Add New Content
-ContentRouter.post('/add', authMiddleware, async(req: Request, res: Response) => {
+ContentRouter.post('/', authMiddleware, async(req: Request, res: Response) => {
     try{
         const { success, data, error} = ContentSchema.safeParse(req.body)
         if(!success){
@@ -45,6 +45,8 @@ ContentRouter.post('/add', authMiddleware, async(req: Request, res: Response) =>
 // Get all Content
 ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
     try{
+        // @ts-ignore
+        console.log(req.userId)
         const allContent = await ContentModel.find({ 
             // @ts-ignore
             userId: req.userId
@@ -53,8 +55,6 @@ ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
         .populate("tags", 'title')
         
         res.status(200).json({
-            // @ts-ignore
-            message: `All Content for ${allContent.userId.username}`,
             allContent
         })
     } catch (e){

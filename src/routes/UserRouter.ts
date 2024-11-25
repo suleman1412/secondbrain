@@ -69,7 +69,6 @@ UserRouter.post('/login', async(req: Request, res:Response) => {
                     }, process.env.JWT_SECRET! as string,
                     {expiresIn: '1h'}
                 )
-                    res.setHeader('Authorization', `Bearer ${token}`)
                     res.status(200).json({ 
                         message: "Login Succesful, token set", 
                         token: token 
