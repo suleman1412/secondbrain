@@ -52,20 +52,19 @@ BrainRouter.get("/:shareLink", async(req:Request, res:Response)  => {
     const shareLink = req.params.shareLink;
     try{
         const collectionLink = await LinksModel.findOne({ hash: shareLink })
+        console.log(collectionLink?.userId.toString())
         if(!collectionLink){
             res.status(404).json({
                 message: "Could not find the collection"
             })
         } else{
-            const content = await ContentModel.findOne({
-                userId: collectionLink.userId
+            const content = await ContentModel.find({
+                userId: collectionLink.userId.toString()
             })
             .populate('tags', 'title')
             .populate('userId', 'username')
 
             res.status(200).json({
-                // @ts-ignore
-                message: `content found for ${content.userId.username}`,
                 content
             })
         }
