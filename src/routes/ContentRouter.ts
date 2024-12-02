@@ -8,18 +8,21 @@ export const ContentRouter = Router()
 
 
 // Add New Content
-ContentRouter.post('/add', authMiddleware, async(req: Request, res: Response) => {
+ContentRouter.post('/', authMiddleware, async(req: Request, res: Response)  => {
     try{
+        console.log(req.body)
         const { success, data, error} = ContentSchema.safeParse(req.body)
         if(!success){
+            console.log('Validation Errors:', error.errors);
+            console.log('Request Body:', req.body);
             res.status(411).json({
                 message: "Error in inputs",
                 errors: error.errors
             });
         } else{
-            
             // Making DB call to TagSchema here to create if not exist Tags and extract the tagIds
             const tagIds = await ProcessTags(data.tags)
+            // console.log(data)
 
             await ContentModel.create({
                 link: data.link,
@@ -45,6 +48,8 @@ ContentRouter.post('/add', authMiddleware, async(req: Request, res: Response) =>
 // Get all Content
 ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
     try{
+        // @ts-ignore
+        console.log(req.userId)
         const allContent = await ContentModel.find({ 
             // @ts-ignore
             userId: req.userId
@@ -53,8 +58,6 @@ ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
         .populate("tags", 'title')
         
         res.status(200).json({
-            // @ts-ignore
-            message: `All Content for ${allContent.userId.username}`,
             allContent
         })
     } catch (e){
