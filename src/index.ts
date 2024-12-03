@@ -20,6 +20,11 @@ app.use('/v1/user', UserRouter)
 app.use('/v1/content', ContentRouter)
 app.use('/v1/brain', BrainRouter)
 
+app.get('/', (req, res) => {
+    res.status(200).json({
+        message: "BigBrain backend - By Suleman"
+    })
+})
 app.listen(PORT, () => {
     console.log("Server on http://localhost:" + PORT)
 })
