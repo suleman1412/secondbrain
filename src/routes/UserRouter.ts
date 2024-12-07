@@ -38,7 +38,7 @@ UserRouter.post('/register', async(req: Request, res: Response) => {
         // @ts-ignore
         if(error.code === 11000){
             res.status(403).json({
-                message: "User already exists with this username, please pick another."
+                message: "User already exists."
             })
         }
         else{
