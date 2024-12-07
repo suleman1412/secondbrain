@@ -52,7 +52,6 @@ BrainRouter.get("/:shareLink", async(req:Request, res:Response)  => {
     const shareLink = req.params.shareLink;
     try{
         const collectionLink = await LinksModel.findOne({ hash: shareLink })
-        console.log(collectionLink?.userId.toString())
         if(!collectionLink){
             res.status(404).json({
                 message: "Could not find the collection"

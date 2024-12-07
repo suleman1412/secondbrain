@@ -23,6 +23,4 @@ app.get('/', (req, res) => {
         message: "BigBrain backend - By Suleman"
     })
 })
-app.listen(PORT, () => {
-    console.log("Server on http://localhost:" + PORT)
-})
+app.listen(PORT)

@@ -12,8 +12,6 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const { success, data, error } = ContentSchema.safeParse(req.body);
         if (!success) {
-            console.log('Validation Errors:', error.errors);
-            console.log('Request Body:', req.body);
             res.status(411).json({
                 message: "Error in inputs",
                 errors: error.errors,
