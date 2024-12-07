@@ -71,7 +71,7 @@ ContentRouter.get('/', authMiddleware, async(req: Request, res: Response) => {
 // Delete a document
 ContentRouter.delete('/', authMiddleware, async(req: Request, res: Response) => {
     const contentId = req.body.contentId;
-    await ContentModel.deleteMany({
+    await ContentModel.deleteOne({
         _id: contentId,
         // @ts-ignore
         userId: req.userId
