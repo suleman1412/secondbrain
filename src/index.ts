@@ -1,4 +1,4 @@
-import express, { Router } from 'express'
+import express from 'express'
 import dotenv from 'dotenv'
 import { UserRouter } from './routes/UserRouter'
 import { ContentRouter } from './routes/ContentRouter'
@@ -11,9 +11,7 @@ const PORT = process.env.PORT || 3000
 const app = express()
 
 app.use(cors({
-    origin: 'https://secondbrain-fe.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: ['https://secondbrain-fe.vercel.app', 'http://localhost:5173']
 }))
 app.use(express.json())
 app.use('/v1/user', UserRouter)
