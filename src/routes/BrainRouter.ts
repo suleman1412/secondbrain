@@ -17,6 +17,7 @@ BrainRouter.post("/share", authMiddleware, async (req: Request, res: Response) =
             res.status(200).json({
                 message: "User has no content in SecondBrain",
             });
+            return;
         }
 
         if (shareLink) {
@@ -32,12 +33,14 @@ BrainRouter.post("/share", authMiddleware, async (req: Request, res: Response) =
                 message: `Share link enabled for ${linkCreated.userId}`,
                 link: linkCreated.hash,
             });
+            return;
         } else {
             await LinksModel.deleteOne({ userId });
 
             res.status(200).json({
                 message: "Share link has been disabled.",
             });
+            return;
         } 
         
     } catch (e) {
@@ -56,6 +59,7 @@ BrainRouter.get("/:shareLink", async(req:Request, res:Response)  => {
             res.status(404).json({
                 message: "Could not find the collection"
             })
+            return ;
         } else{
             const content = await ContentModel.find({
                 userId: collectionLink.userId.toString()
@@ -64,12 +68,15 @@ BrainRouter.get("/:shareLink", async(req:Request, res:Response)  => {
             .populate('userId', 'username')
 
             res.status(200).json({
-                content
+                content, 
+                shareLink
             })
+            return; 
         }
     } catch(e){
         res.status(500).json({
             message: "Internal Server Errror in /:shareLink"
         })
+        return ;
     }
 })
