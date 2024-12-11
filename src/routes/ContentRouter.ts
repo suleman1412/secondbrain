@@ -19,20 +19,28 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             return;
         }
 
-        const tagIds = await ProcessTags(data.tags);
-
+        // const tagIds = await ProcessTags(data.tags);
+        
         await ContentModel.create({
+            contentId: data.contentId,
             link: data.link,
             type: data.type,
             title: data.title,
-            tags: tagIds,
+            tags: data.tags,
+            createdAt: data.createdAt,
             // @ts-ignore
             userId: req.userId, 
         });
 
         res.status(200).json({
-            // @ts-ignore
-            message: `Content created for ${req.userId}`,
+            content: {
+                link: data.link,
+                type: data.type,
+                title: data.title,
+                tags: data.tags,
+                contentId: data.contentId,
+                createdAt: data.createdAt
+            },
         });
     } catch (e) {
         res.status(500).json({
@@ -45,6 +53,7 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
 // Get All Content
 ContentRouter.get('/', authMiddleware, async (req: Request, res: Response) => {
     try {
+        
         const allContent = await ContentModel.find({
              // @ts-ignore
             userId: req.userId, 
@@ -76,7 +85,7 @@ ContentRouter.delete('/', authMiddleware, async (req: Request, res: Response) =>
         }
 
         await ContentModel.deleteOne({
-            _id: contentId,
+            contentId: contentId,
              // @ts-ignore
             userId: req.userId, 
         });
@@ -105,7 +114,7 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
             return;
         }
 
-        const { contentId } = req.body;
+        const contentId = req.body.contentId;
 
         if (!contentId) {
             res.status(400).json({
@@ -114,11 +123,11 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
             return;
         }
 
-        const tagIds = await ProcessTags(data.tags);
+        // const tagIds = await ProcessTags(data.tags);
 
         const updatedContent = await ContentModel.findOneAndUpdate(
             {
-                _id: contentId,
+                contentId: contentId,
                  // @ts-ignore
                 userId: req.userId,
             },
@@ -126,7 +135,8 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
                 link: data.link,
                 type: data.type,
                 title: data.title,
-                tags: tagIds,
+                tags: data.tags,
+                contentId: contentId
             },
             { new: true }
         );

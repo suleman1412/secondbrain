@@ -1,6 +1,16 @@
 import { z } from "zod";
 import { contentTypes } from "../db/db";
 
+const tagSchema = z.object({
+    tagId: z.string(),
+    title: z
+        .string()
+        .toLowerCase()
+        .trim()
+        .max(12, { message: "Max length of tag is 12" })
+        .transform((v) => v.replace(/[&\/\\#, +()$~%.'":*?<>{}]/g, '-'))
+});
+
 export const AuthSchema = z.object({
     username: z.string().min(3, {message: "Username has to be minimum of 3 letters"})
         .max(10, {message: "Username has to be maximum of 10 letters"}),
@@ -13,10 +23,9 @@ export const ContentSchema = z.object({
     link: z.string().min(1, {message: "Enter a valid link"}),
     type: z.enum(contentTypes, {message: "Enter a valid type"}),
     title: z.string().min(1, {message: "Enter title"}),
-    tags: z.string().toLowerCase().trim().max(12, { message: "Max length of tag is 12" }) 
-        .transform((v) => 
-        v.replace(/[&\/\\#, +()$~%.'":*?<>{}]/g, '-') 
-        )
-        .array()
+    tags: z.array(tagSchema),
+    contentId: z.string(),
+    createdAt: z.string()
 })
+
 
