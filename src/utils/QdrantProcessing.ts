@@ -1,6 +1,5 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { ContentType } from "../types/Schemas";
-import { v4 as uuidv4 } from 'uuid';
 
 const client = new QdrantClient({ 
     host: process.env.QDRANT_HOST, 
@@ -34,5 +33,4 @@ export const QdrantSearch = async (embeddings : number[]) => {
     } catch(e){
         console.log(e)
     }
-    
 }
