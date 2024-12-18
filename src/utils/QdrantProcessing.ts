@@ -13,8 +13,8 @@ export const QdrantUpsertPoints = async(embeddings: number[], data: ContentType 
     try {
         const response = await client.upsert("bigBrain", {
             points: [{
-                id: uuidv4(),  
-                // payload: data,   
+                id: data.contentId,  
+                payload: data,   
                 vector: embeddings,  
               }]
         });

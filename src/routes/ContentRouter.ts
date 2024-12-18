@@ -1,8 +1,11 @@
 import { Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { ContentSchema } from "../types/Schemas";
-import { ContentModel } from "../db/db";
+import { ContentModel, TagsModel } from "../db/db";
 import { ProcessTags } from "../utils/ProcessTag";
+
+import { getEmbeddings } from "../utils/TextEmbeddings";
+import { QdrantUpsertPoints } from "../utils/QdrantProcessing";
 
 // Set up the router
 export const ContentRouter = Router();
@@ -18,8 +21,10 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             });
             return;
         }
-
-        // const tagIds = await ProcessTags(data.tags);
+        const tagTitles = data.tags.map(tag => tag.title)
+        console.log('Generating tags' , tagTitles)
+        await ProcessTags(data.tags);
+        console.log('Tags generated successfully' , tagTitles)
         
         await ContentModel.create({
             contentId: data.contentId,
@@ -31,7 +36,11 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             // @ts-ignore
             userId: req.userId, 
         });
-
+        console.log('entry in mongo Succesful')
+        const embeddings = await getEmbeddings(data)
+        console.log('Embeddings created:  Succesful')
+        await QdrantUpsertPoints(embeddings, data)
+        console.log('QDRAnt point created:  Succesful')
         res.status(200).json({
             content: {
                 link: data.link,
@@ -42,6 +51,7 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
                 createdAt: data.createdAt
             },
         });
+
     } catch (e) {
         res.status(500).json({
             message: "Internal Server Error",
@@ -136,7 +146,6 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
                 type: data.type,
                 title: data.title,
                 tags: data.tags,
-                contentId: contentId
             },
             { new: true }
         );

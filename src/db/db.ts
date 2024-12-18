@@ -46,11 +46,7 @@ const TagSchema = new Schema({
         required:true, 
         set: (a: string) => a.toLowerCase().trim()
     },
-    tagId: {
-        type: String,
-        required: true,
-        unique: true
-    },
+    tagId: {type: String, required: true, unique:true},
 })
 
 const LinkSchema = new Schema({
