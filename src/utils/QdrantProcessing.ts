@@ -1,5 +1,7 @@
-import { QdrantClient } from "@qdrant/js-client-rest";
+import { QdrantClient, QdrantClientUnexpectedResponseError } from "@qdrant/js-client-rest";
 import { ContentType } from "../types/Schemas";
+import { cleanPayload } from "./cleanPayload";
+import { getEmbeddings } from "./TextEmbeddings";
 
 const client = new QdrantClient({ 
     host: process.env.QDRANT_HOST, 
@@ -7,20 +9,24 @@ const client = new QdrantClient({
     apiKey: process.env.QDRANT_API
 })
 
-export const QdrantUpsertPoints = async(embeddings: number[], data: ContentType ) => {
-    console.log('in Qdrant upsert Points')
+export const QdrantUpsertPoints = async(data: ContentType ) => {
+    const payload = cleanPayload(data)
+    const embeddings = await getEmbeddings(payload)
     try {
-        const response = await client.upsert("bigBrain", {
+        
+        await client.upsert("bigBrain", {
             points: [{
                 id: data.contentId,  
-                payload: data,   
+                payload: payload,   
                 vector: embeddings,  
-              }]
+            }]
         });
-        console.log(response.status);
+        console.log("Qdrant Created id: ", data.contentId)
+        return;
       } catch (error) {
         console.error("Error upserting points:", error);
-      }
+        throw new Error("Error in Qdrant upsert points: " + error); 
+        }
 }
 
 export const QdrantSearch = async (embeddings : number[]) => {
@@ -29,8 +35,22 @@ export const QdrantSearch = async (embeddings : number[]) => {
             vector: embeddings,
             limit: 5
         })
-        return response
-    } catch(e){
-        console.log(e)
+        return response.map(response => response.id)
+    } catch(error){
+        console.error("Error searching for points:", error);
+        throw new Error("Error in Qdrant search: " + error); 
+    }
+}
+
+export const QdrantDelete = async(contentId: string) => {
+    try{
+        await client.delete("bigBrain", {
+            points: [contentId]
+        })
+        console.log("Qdrant Deleting id: ", contentId)
+        return;
+    } catch (error){
+        console.error("Error deleting points:", error);
+        throw new Error("Error in QdrantDelete: " + error); 
     }
 }

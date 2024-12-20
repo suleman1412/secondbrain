@@ -4,10 +4,8 @@ import { ContentSchema } from "../types/Schemas";
 import { ContentModel, TagsModel } from "../db/db";
 import { ProcessTags } from "../utils/ProcessTag";
 
-import { getEmbeddings } from "../utils/TextEmbeddings";
-import { QdrantUpsertPoints } from "../utils/QdrantProcessing";
+import { QdrantDelete, QdrantUpsertPoints } from "../utils/QdrantProcessing";
 
-// Set up the router
 export const ContentRouter = Router();
 
 // Add New Content
@@ -21,10 +19,10 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             });
             return;
         }
-        const tagTitles = data.tags.map(tag => tag.title)
-        console.log('Generating tags' , tagTitles)
         await ProcessTags(data.tags);
-        console.log('Tags generated successfully' , tagTitles)
+        
+        // Putting this over inserting in mongo because its less reliable
+        await QdrantUpsertPoints(data)
         
         await ContentModel.create({
             contentId: data.contentId,
@@ -36,11 +34,6 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             // @ts-ignore
             userId: req.userId, 
         });
-        console.log('entry in mongo Succesful')
-        const embeddings = await getEmbeddings(data)
-        console.log('Embeddings created:  Succesful')
-        await QdrantUpsertPoints(embeddings, data)
-        console.log('QDRAnt point created:  Succesful')
         res.status(200).json({
             content: {
                 link: data.link,
@@ -99,7 +92,7 @@ ContentRouter.delete('/', authMiddleware, async (req: Request, res: Response) =>
              // @ts-ignore
             userId: req.userId, 
         });
-
+        await QdrantDelete(contentId)
         res.status(200).json({
             message: "Deleted",
         });
@@ -132,9 +125,6 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
             });
             return;
         }
-
-        // const tagIds = await ProcessTags(data.tags);
-
         const updatedContent = await ContentModel.findOneAndUpdate(
             {
                 contentId: contentId,
@@ -157,6 +147,7 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
             return;
         }
 
+        await QdrantUpsertPoints(data)
         res.status(200).json({
             message: "Content updated successfully",
             updatedContent,
