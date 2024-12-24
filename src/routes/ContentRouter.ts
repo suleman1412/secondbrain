@@ -4,7 +4,8 @@ import { ContentSchema } from "../types/Schemas";
 import { ContentModel, TagsModel } from "../db/db";
 import { ProcessTags } from "../utils/ProcessTag";
 
-import { QdrantDelete, QdrantUpsertPoints } from "../utils/QdrantProcessing";
+import { QdrantDelete, QdrantSearch, QdrantUpsertPoints } from "../utils/QdrantProcessing";
+import { getEmbeddings } from "../utils/TextEmbeddings";
 
 export const ContentRouter = Router();
 
@@ -160,3 +161,12 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
         });
     }
 });
+
+ContentRouter.post('/search', authMiddleware, async(req,res) => {
+    const searchQuery = req.body.search
+    const queryEmbeddings = await getEmbeddings(searchQuery)
+    const response = await QdrantSearch(queryEmbeddings)
+    res.status(200).json({
+        search: response
+    })
+})

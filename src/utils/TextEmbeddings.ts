@@ -1,4 +1,9 @@
 import { CleanedPayload } from "./cleanPayload";
+import { CohereClient } from 'cohere-ai';
+
+const cohere = new CohereClient({
+    token: process.env.COHERE_API_KEY
+})
 
 export const getEmbeddings = async (data: CleanedPayload | string): Promise<number[]> => {
     let stagedData: string;
@@ -13,19 +18,13 @@ export const getEmbeddings = async (data: CleanedPayload | string): Promise<numb
         throw new Error("Staged data is empty, cannot generate embeddings.");
     }
     try {
-        const response = await fetch(`${process.env.E5LARGEMODEL}`, {
-            headers: {
-                Authorization: `Bearer ${process.env.HUGGINGFACE_API}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({ inputs: stagedData }),
+        const embed = await cohere.v2.embed({
+            model: 'embed-english-v3.0',
+            inputType: 'search_document',
+            embeddingTypes: ['float'],
+            texts: [stagedData],
         });
-        console.log("Embeddings generated for data: ", data)
-        if (!response.ok) {
-            throw new Error(`Failed to fetch embeddings: ${response.status} ${response.statusText}`);
-        }
-        const vector: Promise<number[]> = await response.json();
+        const vector = embed.embeddings.float![0]
         return vector;
 
     } catch (error) {
