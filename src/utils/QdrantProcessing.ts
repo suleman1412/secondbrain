@@ -25,7 +25,6 @@ export const QdrantUpsertPoints = async(data: ContentType ) => {
         return;
       } catch (error) {
         console.error("Error upserting points:", error);
-        throw new Error("Error in Qdrant upsert points: " + error); 
         }
 }
 
@@ -33,12 +32,11 @@ export const QdrantSearch = async (embeddings : number[]) => {
     try{
         const response = await client.search("bigBrain", {
             vector: embeddings,
-            limit: 5
+            limit: 3
         })
         return response.map(response => response.id)
     } catch(error){
         console.error("Error searching for points:", error);
-        throw new Error("Error in Qdrant search: " + error); 
     }
 }
 
@@ -51,6 +49,5 @@ export const QdrantDelete = async(contentId: string) => {
         return;
     } catch (error){
         console.error("Error deleting points:", error);
-        throw new Error("Error in QdrantDelete: " + error); 
     }
 }
