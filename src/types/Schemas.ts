@@ -28,4 +28,6 @@ export const ContentSchema = z.object({
     createdAt: z.string()
 })
 
+export type ContentType = z.infer<typeof ContentSchema>
+export type TagType = z.infer<typeof tagSchema>
 

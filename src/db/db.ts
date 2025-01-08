@@ -14,12 +14,6 @@ const ContentSchema = new Schema({
     link: {
         type: String, 
         required: true,
-        validate: {
-            validator: (a : string) => {
-                return /https?:\/\/(www\.)?[a-zA-Z0-9\-]+\.[a-z]{2,}(\/[^\s]*)?|\bwww\.[a-zA-Z0-9\-]+\.[a-z]{2,}(\/[^\s]*)?/.test(a)
-            },
-            message: "Please enter a valid URL"
-        }
     },
     type: {type: String, enum:contentTypes, required: true},
     title: {type: String, required: true},
@@ -46,11 +40,7 @@ const TagSchema = new Schema({
         required:true, 
         set: (a: string) => a.toLowerCase().trim()
     },
-    tagId: {
-        type: String,
-        required: true,
-        unique: true
-    },
+    tagId: {type: String, required: true, unique:true},
 })
 
 const LinkSchema = new Schema({

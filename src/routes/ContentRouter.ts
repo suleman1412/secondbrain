@@ -1,10 +1,12 @@
 import { Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { ContentSchema } from "../types/Schemas";
-import { ContentModel } from "../db/db";
+import { ContentModel, TagsModel } from "../db/db";
 import { ProcessTags } from "../utils/ProcessTag";
 
-// Set up the router
+import { QdrantDelete, QdrantSearch, QdrantUpsertPoints } from "../utils/QdrantProcessing";
+import { getEmbeddings } from "../utils/TextEmbeddings";
+
 export const ContentRouter = Router();
 
 // Add New Content
@@ -18,8 +20,10 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             });
             return;
         }
-
-        // const tagIds = await ProcessTags(data.tags);
+        await ProcessTags(data.tags);
+        
+        // Putting this over inserting in mongo because its less reliable
+        await QdrantUpsertPoints(data)
         
         await ContentModel.create({
             contentId: data.contentId,
@@ -31,7 +35,6 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
             // @ts-ignore
             userId: req.userId, 
         });
-
         res.status(200).json({
             content: {
                 link: data.link,
@@ -42,6 +45,7 @@ ContentRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
                 createdAt: data.createdAt
             },
         });
+
     } catch (e) {
         res.status(500).json({
             message: "Internal Server Error",
@@ -89,7 +93,7 @@ ContentRouter.delete('/', authMiddleware, async (req: Request, res: Response) =>
              // @ts-ignore
             userId: req.userId, 
         });
-
+        await QdrantDelete(contentId)
         res.status(200).json({
             message: "Deleted",
         });
@@ -122,9 +126,6 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
             });
             return;
         }
-
-        // const tagIds = await ProcessTags(data.tags);
-
         const updatedContent = await ContentModel.findOneAndUpdate(
             {
                 contentId: contentId,
@@ -136,7 +137,6 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
                 type: data.type,
                 title: data.title,
                 tags: data.tags,
-                contentId: contentId
             },
             { new: true }
         );
@@ -148,6 +148,7 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
             return;
         }
 
+        await QdrantUpsertPoints(data)
         res.status(200).json({
             message: "Content updated successfully",
             updatedContent,
@@ -160,3 +161,12 @@ ContentRouter.put('/', authMiddleware, async (req: Request, res: Response) => {
         });
     }
 });
+
+ContentRouter.post('/search', authMiddleware, async(req,res) => {
+    const searchQuery = req.body.search
+    const queryEmbeddings = await getEmbeddings(searchQuery)
+    const response = await QdrantSearch(queryEmbeddings)
+    res.status(200).json({
+        search: response
+    })
+})

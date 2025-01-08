@@ -4,6 +4,9 @@ import { UserRouter } from './routes/UserRouter'
 import { ContentRouter } from './routes/ContentRouter'
 import { BrainRouter } from './routes/BrainRouter'
 import cors from 'cors'
+import { getEmbeddings } from './utils/TextEmbeddings'
+import { QdrantSearch } from './utils/QdrantProcessing'
+import { authMiddleware } from './middleware/authMiddleware'
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -19,8 +22,10 @@ app.use('/v1/content', ContentRouter)
 app.use('/v1/brain', BrainRouter)
 
 app.get('/', (req, res) => {
+    // healthy
     res.status(200).json({
         message: "BigBrain backend - By Suleman"
     })
 })
+
 app.listen(PORT)
